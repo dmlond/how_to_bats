@@ -4,7 +4,7 @@ load 'libs/bats-assert/load'
 load 'helpers'
 load 'oc_mock'
 
-profile_script="./bin/ci/deploy"
+profile_script="./bin/deploy.sh"
 
 setup() {
   export CI_COMMIT_REF_SLUG="CI_COMMIT_REF_SLUG"
