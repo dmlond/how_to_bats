@@ -334,8 +334,8 @@ setup_publish() {
 
 @test ".run_main calls check_required_environment, login, and build_candidate when the environment" {
   setup_publish
-  local expected_environment=$(echo "${CI_COMMIT_REF_SLUG}" | sed "s/\-deployment.*//" | sed "s/\_/\-/g")
-  local expected_application=$(echo "${CI_PROJECT_NAME}" | sed "s/\_/\-/g")
+  local expected_environment=${CI_COMMIT_REF_SLUG}
+  local expected_application=${CI_PROJECT_NAME}
   source ${profile_script}
 
   function check_required_environment() { echo "check_required_environment called"; }

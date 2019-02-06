@@ -98,10 +98,7 @@ run_main() {
   check_required_environment || exit 1
   login || exit 1
 
-  environment=$(echo "${CI_COMMIT_REF_SLUG}" | sed "s/\-deployment.*//" | sed "s/\_/\-/g")
-  application=$(echo "${CI_PROJECT_NAME}" | sed "s/\_/\-/g")
-
-  build_candidate "${application}" "${environment}" || return 1
+  build_candidate "${CI_PROJECT_NAME}" "${CI_COMMIT_REF_SLUG}" || return 1
   raise "ALL COMPLETE"
 }
 
