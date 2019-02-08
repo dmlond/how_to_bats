@@ -153,12 +153,12 @@ setup_publish() {
 }
 
 @test ".login does not call check_required_publish_environment, print information, or run docker login when DO_NOT_PUBLISH environment variable is present" {
+  source ${profile_script}
   setup_publish
   export DO_NOT_PUBLISH=1
   function check_required_publish_environment() { echo "check_required_publish_environment called"; }
   export -f check_required_publish_environment
   mock_docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-  source ${profile_script}
   run login
   assert_success
   refute_output -p "check_required_environment called"
@@ -166,10 +166,10 @@ setup_publish() {
   refute_output -p "login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}"
   unset DO_NOT_PUBLISH
 }
-@test ".login calls check_required_publish_environment and prints information without calling docker login when DO_NOT_PUBLISH environment variable is not present but it is a dry_run" {
 
-  setup_publish
+@test ".login calls check_required_publish_environment and prints information without calling docker login when DO_NOT_PUBLISH environment variable is not present but it is a dry_run" {
   source ${profile_script}
+  setup_publish
   function dry_run() { echo "dry_run called"; return; };
   function check_required_publish_environment() { echo "check_required_publish_environment called"; return; }
   export -f dry_run check_required_publish_environment
@@ -193,10 +193,10 @@ setup_publish() {
 }
 
 @test ".build_candidate takes an application and environment to use in naming the candidate image, prints information, runs docker build and publish_image on the candidate image when its not a dry_run" {
+  source ${profile_script}
   local application='application'
   local environment='environment'
   local expected_candidate_image="${application}-candidate:${environment}"
-  source ${profile_script}
   mock_docker build --pull -t "${expected_candidate_image}" .
   function publish_image() { echo "publishing ${1}"; }
   export -f publish_image
@@ -208,10 +208,10 @@ setup_publish() {
 }
 
 @test ".build_candidate fails when docker build fails" {
+  source ${profile_script}
   local application='application'
   local environment='environment'
   local expected_candidate_image="${application}-candidate:${environment}"
-  source ${profile_script}
   mock_docker build --pull -t "${expected_candidate_image}" . and_fail
   function publish_image() { echo "publishing ${1}"; }
   export -f publish_image
@@ -224,10 +224,10 @@ setup_publish() {
 }
 
 @test ".build_candidate fails when publish_image fails" {
+  source ${profile_script}
   local application='application'
   local environment='environment'
   local expected_candidate_image="${application}-candidate:${environment}"
-  source ${profile_script}
   mock_docker build --pull -t "${expected_candidate_image}" .
   function publish_image() { echo "publishing ${1}"; return 1; }
   export -f publish_image
@@ -239,10 +239,10 @@ setup_publish() {
 }
 
 @test ".build_candidate only prints information and runs publish_image when its a dry_run" {
+  source ${profile_script}
   local application='application'
   local environment='environment'
   local expected_candidate_image="${application}-candidate:${environment}"
-  source ${profile_script}
   mock_docker build --pull -t "${expected_candidate_image}" .
   function publish_image() { echo "publishing ${1}"; }
   export -f publish_image
@@ -255,11 +255,11 @@ setup_publish() {
 }
 
 @test ".publish_image does not print information, docker tag, or docker push if DO_NOT_PUBLISH environment variable is present" {
+  source ${profile_script}
   setup_publish
   export DO_NOT_PUBLISH=1
   local expected_image="image"
   local expected_publishable_image="${CI_REGISTRY_IMAGE}/${expected_image}"
-  source ${profile_script}
   mock_docker tag "${expected_image}" "${expected_publishable_image}"
   mock_docker push "${expected_publishable_image}"
   run publish_image "${expected_image}"
@@ -271,10 +271,10 @@ setup_publish() {
 }
 
 @test ".publish_image prints information, runs docker tag, and docker push if DO_NOT_PUBLISH environment variable is not present" {
+  source ${profile_script}
   setup_publish
   local expected_image="image"
   local expected_publishable_image="${CI_REGISTRY_IMAGE}/${expected_image}"
-  source ${profile_script}
   mock_docker tag "${expected_image}" "${expected_publishable_image}"
   mock_docker push "${expected_publishable_image}"
   run publish_image "${expected_image}"
@@ -286,10 +286,10 @@ setup_publish() {
 }
 
 @test ".publish_image fails if docker tag fails" {
+  source ${profile_script}
   setup_publish
   local expected_image="image"
   local expected_publishable_image="${CI_REGISTRY_IMAGE}/${expected_image}"
-  source ${profile_script}
   mock_docker tag "${expected_image}" "${expected_publishable_image}" and_fail
   mock_docker push "${expected_publishable_image}"
   run publish_image "${expected_image}"
@@ -301,10 +301,10 @@ setup_publish() {
 }
 
 @test ".publish_image fails if docker push fails" {
+  source ${profile_script}
   setup_publish
   local expected_image="image"
   local expected_publishable_image="${CI_REGISTRY_IMAGE}/${expected_image}"
-  source ${profile_script}
   mock_docker tag "${expected_image}" "${expected_publishable_image}"
   mock_docker push "${expected_publishable_image}" and_fail
   run publish_image "${expected_image}"
@@ -316,10 +316,10 @@ setup_publish() {
 }
 
 @test ".publish_image prints information, does not run docker tag or docker push if DO_NOT_PUBLISH environment variable is not present but its a dry_run" {
+  source ${profile_script}
   setup_publish
   local expected_image="image"
   local expected_publishable_image="${CI_REGISTRY_IMAGE}/${expected_image}"
-  source ${profile_script}
   mock_docker tag "${expected_image}" "${expected_publishable_image}"
   mock_docker push "${expected_publishable_image}"
   function dry_run() { return; }
@@ -333,10 +333,10 @@ setup_publish() {
 }
 
 @test ".run_main calls check_required_environment, login, and build_candidate when the environment" {
+  source ${profile_script}
   setup_publish
   local expected_environment=${CI_COMMIT_REF_SLUG}
   local expected_application=${CI_PROJECT_NAME}
-  source ${profile_script}
 
   function check_required_environment() { echo "check_required_environment called"; }
   export -f check_required_environment
